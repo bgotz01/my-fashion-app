@@ -31,7 +31,7 @@ const Register = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="bg-white dark:bg-gray-800 p-8 rounded shadow-md w-full max-w-md">
+      <div className="bg-white dark:bg-customGrey p-8 rounded shadow-md w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-black dark:text-white">Register</h2>
         {error && <p className="text-red-500 dark:text-red-400 mb-4">{error}</p>}
         <form onSubmit={handleRegister}>
@@ -42,7 +42,7 @@ const Register = () => {
             <input
               type="text"
               id="username"
-              className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded bg-gray-50 dark:bg-gray-900 text-black dark:text-white"
+              className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded bg-gray-50 dark:bg-white text-black dark:text-black"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
@@ -55,7 +55,7 @@ const Register = () => {
             <input
               type="password"
               id="password"
-              className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded bg-gray-50 dark:bg-gray-900 text-black dark:text-white"
+              className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded bg-gray-50 dark:bg-white text-black dark:text-black"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -68,7 +68,7 @@ const Register = () => {
             <input
               type="email"
               id="email"
-              className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded bg-gray-50 dark:bg-gray-900 text-black dark:text-white"
+              className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded bg-gray-50 dark:bg-white text-black dark:text-black"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -81,7 +81,7 @@ const Register = () => {
             <input
               type="text"
               id="solanaWallet"
-              className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded bg-gray-50 dark:bg-gray-900 text-black dark:text-white"
+              className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded bg-gray-50 dark:bg-white text-black dark:text-black"
               value={solanaWallet}
               onChange={(e) => setSolanaWallet(e.target.value)}
             />

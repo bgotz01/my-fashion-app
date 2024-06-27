@@ -9,6 +9,7 @@
     "server": "node server.js"
   },
   "dependencies": {
+    "@radix-ui/react-dropdown-menu": "^2.1.1",
     "@radix-ui/react-slot": "^1.1.0",
     "axios": "^1.7.2",
     "bcrypt": "^5.1.1",
