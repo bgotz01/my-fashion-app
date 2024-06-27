@@ -6,7 +6,7 @@ type Theme = "light" | "dark" | "buji";
 
 interface ThemeContextType {
   theme: Theme;
-  toggleTheme: () => void;
+  toggleTheme: (theme: Theme) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -16,19 +16,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [theme, setTheme] = useState<Theme>("light");
 
-  const toggleTheme = () => {
-    setTheme((prevTheme) => {
-      switch (prevTheme) {
-        case "light":
-          return "dark";
-        case "dark":
-          return "buji";
-        case "buji":
-          return "light";
-        default:
-          return "light";
-      }
-    });
+  const toggleTheme = (toggle:Theme) => {
+    setTheme(toggle);
   };
 
   useEffect(() => {

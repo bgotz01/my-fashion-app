@@ -7,6 +7,14 @@ import Link from "next/link";
 import { useTheme } from "../context/ThemeContext";
 import axios from "axios";
 import Image from "next/image";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const NavBar = () => {
   const { theme, toggleTheme } = useTheme();
@@ -15,11 +23,11 @@ const NavBar = () => {
   const getNextThemeLabel = () => {
     switch (theme) {
       case "light":
-        return "Dark Mode";
-      case "dark":
-        return "Buji Mode";
-      case "buji":
         return "Light Mode";
+      case "dark":
+        return "Dark Mode";
+      case "buji":
+        return "Buji Mode";
       default:
         return "Light Mode";
     }
@@ -42,6 +50,8 @@ const NavBar = () => {
         });
     }
   }, []);
+
+  const textClass = theme === "buji" ? "text-black" : "";
 
   return (
     <nav className="bg-black p-4">
@@ -69,12 +79,37 @@ const NavBar = () => {
           >
             Discover
           </Link>
-          <button
+          {/* <button
             onClick={toggleTheme}
             className="bg-gray-700 text-white px-2 py-1 rounded"
           >
             {getNextThemeLabel()}
-          </button>
+          </button> */}
+          <DropdownMenu>
+            <DropdownMenuTrigger className="bg-gray-700 text-white px-2 py-1 rounded">
+              {getNextThemeLabel()}
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className={`bg-white ${textClass}`}>
+              <DropdownMenuItem
+                className={`dark:hover:text-white ${textClass}`}
+                onSelect={() => toggleTheme("light")}
+              >
+                Light Mode
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className={`dark:hover:text-white ${textClass}`}
+                onSelect={() => toggleTheme("dark")}
+              >
+                Dark Mode
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className={`dark:hover:text-white ${textClass}`}
+                onSelect={() => toggleTheme("buji")}
+              >
+                Buji Mode
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
       <div className="container mx-auto flex justify-between items-center sm:hidden mt-2">
