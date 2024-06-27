@@ -23,6 +23,7 @@ const config = {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
+        'customGrey': "#57606f",  // custom grey color for login and register page box
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
