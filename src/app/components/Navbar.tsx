@@ -28,7 +28,7 @@ const NavBar = () => {
   }, []);
 
   return (
-    <nav className="bg-black p-4">
+    <nav className="px-10 py-5">
       <div className="container mx-auto flex justify-between items-center">
         <Link href="/" className="flex items-center space-x-2">
           <Image 
@@ -38,36 +38,25 @@ const NavBar = () => {
             height={40} 
             className="w-10 h-10"
           />
-          <div className="text-white text-xl font-bold">Bujey</div>
+          <div className={` text-xl font-bold  text-${theme==="light" ? "black":"white"}`}>Bujey</div>
         </Link>
-        <div className="space-x-4 flex items-center">
-          <Link href="/dashboard" className="text-white hidden sm:inline">
+        <div className={`space-x-4 flex items-center text-${theme==="light" ? "black":"white"} `}>
+          <Link href="/dashboard" className=" hidden sm:inline">
             Profile
           </Link>
-          <Link href="/studio" className="text-white hidden sm:inline">
+          <Link href="/studio" className="hidden sm:inline">
             Studio
           </Link>
-          <Link href="/discover/collections" className="text-white hidden sm:inline">
+          <Link href="/discover/collections" className=" hidden sm:inline">
             Discover
           </Link>
           <button
             onClick={toggleTheme}
-            className="bg-gray-700 text-white px-2 py-1 rounded"
-          >
-            {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+            className={`bg-${theme==="light"? "neutral-800":"gray-600"} text-${theme==="light" ? "white":"white"} px-2 py-1 rounded hover:bg-${theme==="light"? "neutral-600":"gray-700"}`}
+            >
+            Themes
           </button>
         </div>
-      </div>
-      <div className="container mx-auto flex justify-between items-center sm:hidden mt-2">
-        <Link href="/dashboard" className="text-white">
-          Profile
-        </Link>
-        <Link href="/studio" className="text-white">
-          Studio
-        </Link>
-        <Link href="/discover/collections" className="text-white">
-          Discover
-        </Link>
       </div>
     </nav>
   );
