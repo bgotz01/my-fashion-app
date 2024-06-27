@@ -391,6 +391,15 @@ server.get('/api/products/:id', async (req, res) => {
   }
 });
 
+// Fetch all public collections route
+server.get('/api/public/collections', async (req, res) => {
+  try {
+    const collections = await Collection.find();
+    res.status(200).json(collections);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
 
 // Public route to fetch products for a collection
 server.get('/api/public/collections/:collectionId/products', async (req, res) => {
