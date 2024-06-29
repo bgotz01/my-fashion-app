@@ -38,13 +38,13 @@
   }
 
   .dark {
-    --background: 0 0% 0%; /* Black background */
+    --background: 0 0% 10%; /* Dark gray background */
     --foreground: #ffffff; /* White text */
 
-    --card: 0 0% 0%; /* Black background for cards */
+    --card: 0 0% 20%; /* Dark gray background for cards */
     --card-foreground: #ffffff; /* White text */
 
-    --popover: 0 0% 0%; /* Black background for popovers */
+    --popover: 0 0% 20%; /* Dark gray background for popovers */
     --popover-foreground: #ffffff; /* White text */
 
     --primary: 0 0% 20%; /* Dark gray background for primary elements */
@@ -67,36 +67,8 @@
     --ring: #ffffff; /* White ring */
   }
 
-  .buji {
-    --background: 0 100% 50%; /* Red background */
-    --foreground: 0 0% 100%; /* White text */
-
-    --card: 0 100% 50%; /* Red background for cards */
-    --card-foreground: 0 0% 100%; /* White text */
-
-    --popover: 0 100% 50%; /* Red background for popovers */
-    --popover-foreground: 0 0% 100%; /* White text */
-
-    --primary: 0 100% 50%; /* Red background */
-    --primary-foreground: 0 0% 100%; /* White text */
-
-    --secondary: 0 100% 75%; /* Light red background for secondary elements */
-    --secondary-foreground: 0 0% 100%; /* White text */
-
-    --muted: 0 100% 75%; /* Light red background for muted elements */
-    --muted-foreground: 0 0% 100%; /* White text */
-
-    --accent: 0 100% 75%; /* Light red background for accent elements */
-    --accent-foreground: 0 0% 100%; /* White text */
-
-    --destructive: 0 100% 25%; /* Dark red background for destructive elements */
-    --destructive-foreground: 0 0% 100%; /* White text */
-
-    --border: 0 100% 75%; /* Light red border */
-    --input: 0 100% 75%; /* Light red input background */
-    --ring: 0 100% 50%; /* Red ring */
-
-    --radius: 0.5rem;
+  .content-with-navbar-padding {
+    padding-top: 4rem; /* Adjust this value to match your navbar height */
   }
 }
 

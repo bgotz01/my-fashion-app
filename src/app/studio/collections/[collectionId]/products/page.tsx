@@ -1,16 +1,13 @@
-//src/app/studio/collections/[collectionId]/products/page.tsx
-
-
+// src/app/studio/collections/[collectionId]/products/page.tsx
 
 'use client';
 
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -18,6 +15,9 @@ interface Product {
   _id: string;
   name: string;
   productAddress: string;
+  gender: string;
+  category: string;
+  color: string[];
   description: string;
   price: number;
   imageUrl1: string;
@@ -30,9 +30,26 @@ interface Product {
   collectionAddress: string;
 }
 
+const genderOptions = [
+  { value: 'men', label: 'Men' },
+  { value: 'women', label: 'Women' }
+];
+
+const categoryOptions: { [key: string]: string[] } = {
+  men: [
+    'Outerwear', 'Coats', 'Blazers', 'Jackets', 'Pants', 'Shorts', 'Shirts', 'Knitwear', 'Sweatshirts', 'T-shirts', 'Polos', 'Formal', 'Leather', 'Swimwear'
+  ],
+  women: [
+    'Outerwear', 'Coats', 'Blazers', 'Jackets', 'Knitwear', 'Tops', 'Sweatshirts', 'Denim', 'Pants', 'Shorts', 'Dresses', 'Jumpsuits', 'Skirts', 'Leather', 'Cocktail', 'Swimwear', 'Lingerie'
+  ]
+};
+
 const AddProductPage = () => {
   const [name, setName] = useState('');
   const [productAddress, setProductAddress] = useState('');
+  const [gender, setGender] = useState('');
+  const [category, setCategory] = useState('');
+  const [color, setColor] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [imageUrl1, setImageUrl1] = useState('');
@@ -70,19 +87,24 @@ const AddProductPage = () => {
     e.preventDefault();
     const token = localStorage.getItem('token');
 
-    if (!name || !productAddress || !price || !imageUrl1) {
+    if (!name || !productAddress || !gender || !category || !color || !price || !imageUrl1) {
       setError('Required fields are missing');
       return;
     }
 
-    console.log('Price before sending:', price); // Log the price before sending
+    const numericPrice = parseFloat(price);
+    const colorArray = color.split(',').map(c => c.trim());
+    console.log('Price to be sent:', numericPrice);
 
     try {
       const response = await axios.post('http://localhost:4000/api/products', {
         name,
         productAddress,
+        gender,
+        category,
+        color: colorArray,
         description,
-        price,
+        price: numericPrice,
         collectionId,
         collectionAddress: products.length > 0 ? products[0].collectionAddress : '', // Assuming all products in the collection have the same address
         imageUrl1,
@@ -102,6 +124,9 @@ const AddProductPage = () => {
         setProducts([...products, response.data]);
         setName('');
         setProductAddress('');
+        setGender('');
+        setCategory('');
+        setColor('');
         setDescription('');
         setPrice('');
         setImageUrl1('');
@@ -145,6 +170,9 @@ const AddProductPage = () => {
     setEditProductId(product._id);
     setName(product.name);
     setProductAddress(product.productAddress);
+    setGender(product.gender);
+    setCategory(product.category);
+    setColor(product.color.join(', '));
     setDescription(product.description);
     setPrice(product.price.toString());
     setImageUrl1(product.imageUrl1);
@@ -159,17 +187,24 @@ const AddProductPage = () => {
     e.preventDefault();
     const token = localStorage.getItem('token');
 
-    if (!name || !productAddress || !price || !imageUrl1) {
+    if (!name || !productAddress || !gender || !category || !color || !price || !imageUrl1) {
       setError('Required fields are missing');
       return;
     }
+
+    const numericPrice = parseFloat(price);
+    const colorArray = color.split(',').map(c => c.trim());
+    console.log('Price to be sent:', numericPrice);
 
     try {
       const response = await axios.put(`http://localhost:4000/api/products/${editProductId}`, {
         name,
         productAddress,
+        gender,
+        category,
+        color: colorArray,
         description,
-        price,
+        price: numericPrice,
         imageUrl1,
         imageUrl2,
         imageUrl3,
@@ -188,6 +223,9 @@ const AddProductPage = () => {
         setEditProductId(null);
         setName('');
         setProductAddress('');
+        setGender('');
+        setCategory('');
+        setColor('');
         setDescription('');
         setPrice('');
         setImageUrl1('');
@@ -209,6 +247,9 @@ const AddProductPage = () => {
     setEditProductId(null);
     setName('');
     setProductAddress('');
+    setGender('');
+    setCategory('');
+    setColor('');
     setDescription('');
     setPrice('');
     setImageUrl1('');
@@ -219,7 +260,9 @@ const AddProductPage = () => {
     setJsonUrl('');
   };
 
-  
+  const trimAddress = (address: string) =>
+    `${address.slice(0, 6)}...${address.slice(-4)}`;
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
       <div className="w-full max-w-2xl space-y-4">
@@ -227,11 +270,18 @@ const AddProductPage = () => {
         {products.map((product: Product) => (
           <Card key={product._id} className="flex justify-between items-center p-4 border rounded">
             <div className="flex items-center space-x-4">
-              <Image src={product.imageUrl1} alt={product.name} width={80} height={80} className="object-cover rounded-md" />
+              <Image 
+                src={product.imageUrl1} 
+                alt={product.name} 
+                width={200} 
+                height={200} 
+                className="object-cover rounded-md"
+                loading="lazy"
+              />
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">{product.name}</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400"><strong>Price:</strong> ${product.price}</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400"><strong>Token:</strong> {product.productAddress}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400"><strong>Token:</strong> {trimAddress(product.productAddress)}</p>
                 <Link href={`/studio/products/${product._id}`} className="text-blue-500 hover:underline">
                   View Product
                 </Link>
@@ -256,6 +306,28 @@ const AddProductPage = () => {
           <div>
             <label htmlFor="productAddress" className="block text-sm font-bold text-gray-700 dark:text-gray-300">Product Address</label>
             <Input id="productAddress" value={productAddress} onChange={(e) => setProductAddress(e.target.value)} placeholder="Product Address" required />
+          </div>
+          <div>
+            <label htmlFor="gender" className="block text-sm font-bold text-gray-700 dark:text-gray-300">Gender</label>
+            <select id="gender" value={gender} onChange={(e) => setGender(e.target.value)} className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
+              <option value="" disabled>Select Gender</option>
+              {genderOptions.map(option => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="category" className="block text-sm font-bold text-gray-700 dark:text-gray-300">Category</label>
+            <select id="category" value={category} onChange={(e) => setCategory(e.target.value)} className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
+              <option value="" disabled>Select Category</option>
+              {gender && categoryOptions[gender]?.map(option => (
+                <option key={option} value={option}>{option}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="color" className="block text-sm font-bold text-gray-700 dark:text-gray-300">Color</label>
+            <Input id="color" value={color} onChange={(e) => setColor(e.target.value)} placeholder="Product Colors (comma separated)" required />
           </div>
           <div>
             <label htmlFor="description" className="block text-sm font-bold text-gray-700 dark:text-gray-300">Description</label>
@@ -295,7 +367,7 @@ const AddProductPage = () => {
           )}
         </form>
       </div>
-  
+
       {deleteProductId && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-8 rounded shadow-md">

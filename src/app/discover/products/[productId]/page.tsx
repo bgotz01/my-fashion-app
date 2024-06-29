@@ -5,8 +5,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'next/navigation';
-import { Card } from '@/components/ui/card';
-import { Skeleton } from "@/components/ui/skeleton";
+import Card from '@/components/Card';
+import Skeleton from '@/components/Skeleton';
 import Image from 'next/image';
 import Link from 'next/link';
 import Slider from 'react-slick';
@@ -104,6 +104,7 @@ const ProductPage: React.FC = () => {
                   width={500} 
                   height={500} 
                   className="object-cover rounded-lg transform transition-transform hover:scale-105"
+                  loading="lazy"
                 />
               </div>
             ))}

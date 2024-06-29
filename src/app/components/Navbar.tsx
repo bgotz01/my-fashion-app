@@ -1,5 +1,6 @@
 // src/app/components/Navbar.tsx
 
+
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -7,31 +8,11 @@ import Link from "next/link";
 import { useTheme } from "../context/ThemeContext";
 import axios from "axios";
 import Image from "next/image";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Sun, Moon } from "lucide-react";
 
 const NavBar = () => {
   const { theme, toggleTheme } = useTheme();
   const [username, setUsername] = useState<string | null>(null);
-
-  const getNextThemeLabel = () => {
-    switch (theme) {
-      case "light":
-        return "Light Mode";
-      case "dark":
-        return "Dark Mode";
-      case "buji":
-        return "Buji Mode";
-      default:
-        return "Light Mode";
-    }
-  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -51,10 +32,12 @@ const NavBar = () => {
     }
   }, []);
 
-  const textClass = theme === "buji" ? "text-black" : "";
+  const handleToggleTheme = () => {
+    toggleTheme(theme === "light" ? "dark" : "light");
+  };
 
   return (
-    <nav className="bg-black p-4">
+    <nav className="bg-black p-4 fixed w-full top-0 z-50">
       <div className="container mx-auto flex justify-between items-center">
         <Link href="/" className="flex items-center space-x-2">
           <Image
@@ -74,42 +57,21 @@ const NavBar = () => {
             Studio
           </Link>
           <Link
-            href="/discover/collections"
+            href="/discover"
             className="text-white hidden sm:inline"
           >
             Discover
           </Link>
-          {/* <button
-            onClick={toggleTheme}
-            className="bg-gray-700 text-white px-2 py-1 rounded"
+          <button
+            onClick={handleToggleTheme}
+            className="bg-black text-white px-2 py-1 rounded flex items-center justify-center"
           >
-            {getNextThemeLabel()}
-          </button> */}
-          <DropdownMenu>
-            <DropdownMenuTrigger className="bg-gray-700 text-white px-2 py-1 rounded">
-              {getNextThemeLabel()}
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className={`bg-white ${textClass}`}>
-              <DropdownMenuItem
-                className={`dark:hover:text-white ${textClass}`}
-                onSelect={() => toggleTheme("light")}
-              >
-                Light Mode
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className={`dark:hover:text-white ${textClass}`}
-                onSelect={() => toggleTheme("dark")}
-              >
-                Dark Mode
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className={`dark:hover:text-white ${textClass}`}
-                onSelect={() => toggleTheme("buji")}
-              >
-                Buji Mode
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            {theme === "light" ? (
+              <Moon className="w-5 h-5 text-white" />
+            ) : (
+              <Sun className="w-5 h-5 text-white" />
+            )}
+          </button>
         </div>
       </div>
       <div className="container mx-auto flex justify-between items-center sm:hidden mt-2">
@@ -119,7 +81,7 @@ const NavBar = () => {
         <Link href="/studio" className="text-white">
           Studio
         </Link>
-        <Link href="/discover/collections" className="text-white">
+        <Link href="/discover" className="text-white">
           Discover
         </Link>
       </div>

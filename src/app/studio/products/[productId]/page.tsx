@@ -13,6 +13,7 @@ interface Product {
   _id: string;
   name: string;
   productAddress: string;
+  category: string;
   description: string;
   price: number;
   imageUrl1: string;
@@ -31,6 +32,7 @@ const ProductProfilePage = () => {
   const [editMode, setEditMode] = useState(false);
   const [name, setName] = useState('');
   const [productAddress, setProductAddress] = useState('');
+  const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [imageUrl1, setImageUrl1] = useState('');
@@ -49,6 +51,7 @@ const ProductProfilePage = () => {
         setProduct(response.data);
         setName(response.data.name);
         setProductAddress(response.data.productAddress);
+        setCategory(response.data.category);
         setDescription(response.data.description);
         setPrice(response.data.price.toString());
         setImageUrl1(response.data.imageUrl1);
@@ -84,6 +87,7 @@ const ProductProfilePage = () => {
       const response = await axios.put(`http://localhost:4000/api/products/${productId}`, {
         name,
         productAddress,
+        category,
         description,
         price,
         imageUrl1,
@@ -116,6 +120,7 @@ const ProductProfilePage = () => {
     if (product) {
       setName(product.name);
       setProductAddress(product.productAddress);
+      setCategory(product.category);
       setDescription(product.description);
       setPrice(product.price.toString());
       setImageUrl1(product.imageUrl1);
@@ -168,6 +173,20 @@ const ProductProfilePage = () => {
               <hr className="border-gray-300 dark:border-gray-600 my-2" />
             </div>
             <div>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300">Category</label>
+              {editMode ? (
+                <Input
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  placeholder="Category"
+                  required
+                />
+              ) : (
+                <p className="text-gray-700 dark:text-gray-300">{product.category}</p>
+              )}
+              <hr className="border-gray-300 dark:border-gray-600 my-2" />
+            </div>
+            <div>
               <label className="block text-sm font-bold text-gray-700 dark:text-gray-300">Description</label>
               {editMode ? (
                 <Input
@@ -206,7 +225,7 @@ const ProductProfilePage = () => {
                 />
               ) : (
                 <>
-                  <Image src={product.imageUrl1} alt={product.name} width={80} height={80} className="object-cover rounded-md" />
+                  <Image src={product.imageUrl1} alt={product.name} width={200} height={200} className="object-cover rounded-md" />
                   <p className="text-gray-700 dark:text-gray-300">{trimUrl(product.imageUrl1)}</p>
                 </>
               )}
@@ -223,7 +242,7 @@ const ProductProfilePage = () => {
               ) : (
                 product.imageUrl2 && (
                   <>
-                    <Image src={product.imageUrl2} alt={product.name} width={80} height={80} className="object-cover rounded-md" />
+                    <Image src={product.imageUrl2} alt={product.name} width={200} height={200} className="object-cover rounded-md" />
                     <p className="text-gray-700 dark:text-gray-300">{trimUrl(product.imageUrl2)}</p>
                   </>
                 )
@@ -241,7 +260,7 @@ const ProductProfilePage = () => {
               ) : (
                 product.imageUrl3 && (
                   <>
-                    <Image src={product.imageUrl3} alt={product.name} width={80} height={80} className="object-cover rounded-md" />
+                    <Image src={product.imageUrl3} alt={product.name} width={200} height={200} className="object-cover rounded-md" />
                     <p className="text-gray-700 dark:text-gray-300">{trimUrl(product.imageUrl3)}</p>
                   </>
                 )
@@ -259,7 +278,7 @@ const ProductProfilePage = () => {
               ) : (
                 product.imageUrl4 && (
                   <>
-                    <Image src={product.imageUrl4} alt={product.name} width={80} height={80} className="object-cover rounded-md" />
+                    <Image src={product.imageUrl4} alt={product.name} width={200} height={200} className="object-cover rounded-md" />
                     <p className="text-gray-700 dark:text-gray-300">{trimUrl(product.imageUrl4)}</p>
                   </>
                 )
@@ -277,7 +296,7 @@ const ProductProfilePage = () => {
               ) : (
                 product.imageUrl5 && (
                   <>
-                    <Image src={product.imageUrl5} alt={product.name} width={80} height={80} className="object-cover rounded-md" />
+                    <Image src={product.imageUrl5} alt={product.name} width={200} height={200} className="object-cover rounded-md" />
                     <p className="text-gray-700 dark:text-gray-300">{trimUrl(product.imageUrl5)}</p>
                   </>
                 )

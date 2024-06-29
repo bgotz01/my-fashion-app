@@ -1,4 +1,4 @@
-//src/app/layout.tsx
+// src/app/layout.tsx
 
 import './globals.css';
 import { ThemeProvider } from './context/ThemeContext';
@@ -18,7 +18,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={cn("min-h-screen bg-background font-sans antialiased", fontSans.variable)}>
         <ThemeProvider>
           <NavBar />
+          <main className="content-with-navbar-padding">
             {children}
+          </main>
         </ThemeProvider>
       </body>
     </html>

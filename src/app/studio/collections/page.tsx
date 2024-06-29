@@ -255,7 +255,9 @@ const CollectionsPage = () => {
         ))}
       </div>
     </div>
-  );
+);
+
+  
 };
 
 export default CollectionsPage;

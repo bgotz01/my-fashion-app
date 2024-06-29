@@ -1,6 +1,4 @@
-//tailwind.config.ts
-
-
+// tailwind.config.ts
 
 import type { Config } from "tailwindcss"
 
@@ -26,6 +24,8 @@ const config = {
         'customGrey': "#57606f",  // custom grey color for login and register page box
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        black: "#000000",  // Custom black color
+        beige: '#f5f5dc', // Adding beige color
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -79,4 +79,4 @@ const config = {
   plugins: [require("tailwindcss-animate")],
 } satisfies Config
 
-export default config
+export default config;

@@ -239,6 +239,33 @@ server.get('/api/collections', async (req, res) => {
   }
 });
 
+// Fetch collection by address
+server.get('/api/public/collections/address/:address', async (req, res) => {
+  const { address } = req.params;
+  try {
+    const collection = await Collection.findOne({ collectionAddress: address });
+    if (!collection) {
+      return res.status(404).json({ message: 'Collection not found' });
+    }
+    res.status(200).json(collection);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+// Add this route for fetching collection by collectionAddress
+server.get('/api/public/collections/address/:collectionAddress', async (req, res) => {
+  try {
+    const { collectionAddress } = req.params;
+    const collection = await Collection.findOne({ collectionAddress });
+    if (!collection) {
+      return res.status(404).json({ message: 'Collection not found' });
+    }
+    res.status(200).json(collection);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
 
 
 
@@ -273,9 +300,11 @@ server.post('/api/products', async (req, res) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_jwt_secret');
-    const { name, productAddress, description, price, collectionId, imageUrl1, imageUrl2, imageUrl3, imageUrl4, imageUrl5, jsonUrl } = req.body;
+    const { name, productAddress, gender, category, color, description, price, collectionId, imageUrl1, imageUrl2, imageUrl3, imageUrl4, imageUrl5, jsonUrl } = req.body;
 
-    if (!name || !productAddress || !price || !collectionId || !imageUrl1) {
+    console.log('Request Body:', req.body); // Add logging
+
+    if (!name || !productAddress || !gender || !category || !color || !price || !collectionId || !imageUrl1) {
       return res.status(400).json({ message: 'Required fields are missing' });
     }
 
@@ -287,6 +316,9 @@ server.post('/api/products', async (req, res) => {
     const product = new Product({
       name,
       productAddress,
+      gender,
+      category,
+      color,
       description,
       price,
       collectionId,
@@ -306,9 +338,11 @@ server.post('/api/products', async (req, res) => {
 
     res.status(201).json(product);
   } catch (error) {
+    console.error('Error adding product:', error); // Add logging
     res.status(400).json({ message: error.message });
   }
 });
+
 
 
 // Edit product route
@@ -319,7 +353,7 @@ server.put('/api/products/:id', async (req, res) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_jwt_secret');
     const { id } = req.params;
-    const { name, tokenAddress, description, price, imageUrl1, imageUrl2, imageUrl3, imageUrl4, imageUrl5, jsonUrl } = req.body;
+    const { name, tokenAddress, gender, category, color, description, price, imageUrl1, imageUrl2, imageUrl3, imageUrl4, imageUrl5, jsonUrl } = req.body;
 
     const product = await Product.findById(id);
     const collection = await Collection.findById(product.collectionId);
@@ -329,6 +363,9 @@ server.put('/api/products/:id', async (req, res) => {
 
     product.name = name || product.name;
     product.tokenAddress = tokenAddress || product.tokenAddress;
+    product.gender = gender || product.gender;
+    product.category = category || product.category;
+    product.color = color || product.color;
     product.description = description || product.description;
     product.price = price || product.price;
     product.imageUrl1 = imageUrl1 || product.imageUrl1;
@@ -368,7 +405,12 @@ server.delete('/api/products/:id', async (req, res) => {
       return res.status(403).json({ message: 'Access denied' });
     }
 
-    await Product.deleteOne({ _id: id }); // Change this line
+    // Remove the product reference from the collection
+    collection.products.pull(product._id);
+    await collection.save();
+
+    // Delete the product
+    await Product.deleteOne({ _id: id });
 
     res.status(200).json({ message: 'Product deleted successfully' });
   } catch (error) {
@@ -376,6 +418,7 @@ server.delete('/api/products/:id', async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 });
+
 
 // Fetch product by ID route
 server.get('/api/products/:id', async (req, res) => {
@@ -482,6 +525,19 @@ server.get('/api/collections/by-designer/:designerId', async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 });
+
+// Fetch designer by username
+server.get('/api/public/designers/username/:username', async (req, res) => {
+  try {
+    const { username } = req.params;
+    const designer = await User.findOne({ username, role: 'designer' });
+    if (!designer) return res.status(404).json({ message: 'Designer not found' });
+    res.status(200).json(designer);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
 
 
 
