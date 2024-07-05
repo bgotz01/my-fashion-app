@@ -4,11 +4,12 @@
 
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Card from '@/components/Card';
-import Image from 'next/image';
 import Skeleton from '@/components/Skeleton';
+import Image from 'next/image';
 import Link from 'next/link';
+import FeaturedCollections from '@/app/components/FeaturedCollections';
 
 interface Product {
   _id: string;
@@ -31,14 +32,13 @@ interface Collection {
 
 const CollectionPage = () => {
   const { collectionId } = useParams() as { collectionId: string };
+  const router = useRouter();
   const [collection, setCollection] = useState<Collection | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     if (collectionId) {
-      console.log('Fetching collection with ID:', collectionId); // Logging
-
       axios.get(`http://localhost:4000/api/public/collections/${collectionId}`)
         .then(response => {
           setCollection(response.data);
@@ -57,20 +57,21 @@ const CollectionPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-black p-4">
-        <Skeleton className="h-[300px] w-[250px] rounded-xl mb-4" />
-        <div className="space-y-2 w-full max-w-2xl">
-          <Skeleton className="h-6 w-48" />
-          <Skeleton className="h-4 w-32" />
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {[...Array(8)].map((_, index) => (
-              <Card key={index} className="flex flex-col items-center p-4 border rounded shadow-md">
-                <Skeleton className="h-[250px] w-[250px] rounded-md" />
-                <Skeleton className="h-4 w-32 mt-2" />
-                <Skeleton className="h-4 w-20 mt-1" />
+      <div className="min-h-screen pt-20 flex flex-col items-center justify-center bg-gray-100 dark:bg-black p-4">
+        <Skeleton className="h-10 w-48 rounded-md mb-2" />
+        <Skeleton className="h-6 w-32 rounded-md mb-4" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {[...Array(8)].map((_, index) => (
+            <div key={index}>
+              <Card>
+                <Skeleton className="h-64 w-full mb-4" />
               </Card>
-            ))}
-          </div>
+              <Card>
+                <Skeleton className="h-6 w-3/4 mb-2" />
+                <Skeleton className="h-4 w-1/2" />
+              </Card>
+            </div>
+          ))}
         </div>
       </div>
     );
@@ -78,77 +79,73 @@ const CollectionPage = () => {
 
   if (!collection) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-black p-4">
-        <div className="flex flex-col space-y-3">
-          <Skeleton className="h-[125px] w-[250px] rounded-xl" />
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-[250px]" />
-            <Skeleton className="h-4 w-[200px]" />
-          </div>
-        </div>
+      <div className="min-h-screen pt-20 flex flex-col items-center justify-center bg-gray-100 dark:bg-black p-4">
+        <Skeleton className="h-10 w-48 rounded-md mb-2" />
+        <Skeleton className="h-6 w-32 rounded-md mb-4" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-black p-4">
-      <Card className="flex flex-col p-4 border rounded bg-white dark:bg-black dark:border-gray-700 mb-8 shadow-lg">
-        <div className="flex items-center mb-4">
-          <Image src={collection.imageUrl} alt={collection.name} width={150} height={150} className="object-cover rounded-md" />
-          <div className="flex flex-col ml-4">
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">{collection.name}</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              <strong>Collection Address:</strong> {collection.collectionAddress}
-            </p>
-          </div>
-        </div>
-        
-        <p className="text-md text-gray-800 dark:text-gray-200">
-          <strong>Designer Username:</strong>
-          <Link href={`/discover/designer/${collection.designerUsername}`} className="text-inherit hover:underline ml-2">
+    <div className="min-h-screen pt-20 flex flex-col items-center bg-gray-100 dark:bg-black p-4">
+      <div className="mb-4 self-start">
+        <button 
+          onClick={() => router.back()} 
+          className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition"
+        >
+          &larr; Back to Discover
+        </button>
+      </div>
+      <div className="mb-8 text-center">
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">{collection.name}</h1>
+        <p className="text-lg text-gray-600 dark:text-gray-400">
+          by 
+          <Link href={`/discover/designers/${collection.designerId}`} className="italic font-medium text-gray-800 dark:text-gray-200 hover:underline ml-1">
             {collection.designerUsername}
           </Link>
         </p>
-        <p className="text-md text-gray-800 dark:text-gray-200">
-          <strong>Designer ID:</strong>
-          <Link href={`/discover/designer/${collection.designerUsername}`} className="text-inherit hover:underline ml-2">
-            {collection.designerId}
-          </Link>
-        </p>
-      </Card>
+      </div>
 
       <div className="w-full">
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-gray-200">Products</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-gray-200"></h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {products.map((product: Product) => (
-            <Card key={product._id} className="relative p-0 border rounded shadow-md transition-shadow duration-300 ease-in-out hover:shadow-lg">
-              <Link href={`/discover/products/${product._id}`}>
-                <div className="relative">
-                  <Image 
-                    src={product.imageUrl1} 
-                    alt={product.name} 
-                    width={300} 
-                    height={300} 
-                    className="object-cover w-full h-full rounded-md transform transition-transform duration-300 ease-in-out hover:scale-105" 
-                  />
-                  {product.imageUrl2 && (
+            <div key={product._id}>
+              <Card className="mb-4">
+                <Link href={`/discover/products/${product._id}`}>
+                  <div className="relative h-64">
                     <Image 
-                      src={product.imageUrl2} 
+                      src={product.imageUrl1} 
                       alt={product.name} 
-                      width={300} 
-                      height={300} 
-                      className="object-cover w-full h-full rounded-md absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-300 ease-in-out" 
+                      layout="fill"
+                      objectFit="contain"
+                      className="rounded-md transform transition-transform duration-300 ease-in-out hover:scale-105" 
                     />
-                  )}
+                    {product.imageUrl2 && (
+                      <Image 
+                        src={product.imageUrl2} 
+                        alt={product.name} 
+                        layout="fill"
+                        objectFit="contain"
+                        className="rounded-md absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-300 ease-in-out" 
+                      />
+                    )}
+                  </div>
+                </Link>
+              </Card>
+              <Card className="bg-gray-100 dark:bg-gray-700 p-4 text-center flex justify-between items-center">
+                <h3 className="text-sm font-semibold text-gray-800 dark:text-white">{product.name}</h3>
+                <div className="flex items-center">
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mr-2">${product.price}</p>
+                  <button className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600">Buy</button>
                 </div>
-              </Link>
-              <div className="flex justify-between rounded-lg items-center p-2 bg-beige dark:bg-gray-900">
-                <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">{product.name}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">${product.price}</p>
-              </div>
-            </Card>
+              </Card>
+            </div>
           ))}
         </div>
+      </div>
+      <div className="w-full max-w-7xl pt-20">
+        <FeaturedCollections />
       </div>
     </div>
   );

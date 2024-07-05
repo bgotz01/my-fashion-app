@@ -11,6 +11,7 @@ import User from './src/models/User.js';
 import Collection from './src/models/Collection.js';
 import Product from './src/models/Product.js';
 import Sizes from './src/models/Sizes.js';
+import NFT from './src/models/NFT.js';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -497,6 +498,31 @@ server.delete('/api/sizes/:id', async (req, res) => {
   }
 });
 
+// Update a size
+server.put('/api/sizes/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { quantity } = req.body;
+
+    if (!quantity || quantity <= 0) {
+      return res.status(400).json({ message: 'Quantity is required and must be greater than 0' });
+    }
+
+    const size = await Sizes.findById(id);
+    if (!size) {
+      return res.status(404).json({ message: 'Size not found' });
+    }
+
+    size.quantity = quantity;
+
+    await size.save();
+    res.status(200).json(size);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+
 
 
 
@@ -538,6 +564,20 @@ server.get('/api/public/designers/username/:username', async (req, res) => {
   }
 });
 
+// Designer profile endpoint
+server.get('/api/public/designers/:designerId', async (req, res) => {
+  try {
+    const { designerId } = req.params;
+    const designer = await User.findById(designerId).select('username solanaWallet');
+    if (!designer) return res.status(404).json({ message: 'Designer not found' });
+
+    const collections = await Collection.find({ designerId }).select('name imageUrl');
+    res.status(200).json({ ...designer.toObject(), collections });
+  } catch (error) {
+    console.error('Error fetching designer profile:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 
 
@@ -560,6 +600,98 @@ server.get('/api/public/collections/:id', async (req, res) => {
   } catch (error) {
     console.error('Error fetching collection:', error); // Logging
     res.status(400).json({ message: error.message });
+  }
+});
+
+
+//NFTS
+
+
+server.post('/api/saveNFT', async (req, res) => {
+  const { tokenAddress, walletAddress } = req.body;
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) return res.status(401).json({ message: 'Access denied' });
+
+  try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_jwt_secret');
+      const designerId = decoded.id;
+
+      if (!tokenAddress || !walletAddress) {
+          return res.status(400).json({ success: false, message: 'Token address and wallet address are required.' });
+      }
+
+      const nft = new NFT({ tokenAddress, walletAddress, designerId });
+      await nft.save();
+      res.status(201).json({ success: true, nft });
+  } catch (error) {
+      console.error('Error saving NFT:', error);
+      res.status(500).json({ success: false, message: 'Failed to save NFT.', error });
+  }
+});
+
+server.get('/api/nfts', async (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) return res.status(401).json({ message: 'Access denied' });
+
+  try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_jwt_secret');
+      const designerId = decoded.id;
+
+      const nfts = await NFT.find({ designerId });
+      res.status(200).json(nfts);
+  } catch (error) {
+      console.error('Error fetching NFTs:', error);
+      res.status(500).json({ success: false, message: 'Failed to fetch NFTs.', error });
+  }
+});
+
+
+// LISTINGS
+
+server.post('/api/listings', async (req, res) => {
+  const { owner, tokenMint, price } = req.body;
+
+  try {
+    const listing = new Listing({
+      owner,
+      tokenMint,
+      price,
+      listedAt: new Date(),
+    });
+
+    await listing.save();
+    res.status(201).json({ message: 'Listing created successfully' });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+server.post('/api/products/list', async (req, res) => {
+  const { tokenMint, price } = req.body;
+
+  try {
+    const product = await Product.findOne({ productAddress: tokenMint });
+
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    product.listed = true;
+    product.price = price; // Use the price provided in the request
+    await product.save();
+
+    res.status(200).json({ message: 'Product listed successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+server.get('/api/products/listed', async (req, res) => {
+  try {
+    const products = await Product.find({ listed: true });
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 

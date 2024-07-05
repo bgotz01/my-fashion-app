@@ -4,34 +4,12 @@
 
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Card from '@/components/Card';
 import Skeleton from '@/components/Skeleton';
 import Image from 'next/image';
 import Link from 'next/link';
-import Slider from 'react-slick';
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
-import './product.css';  // Import the custom CSS file
-import { ArrowBigLeft, ArrowBigRight } from 'lucide-react';
-
-const NextArrow = (props: any) => {
-  const { onClick } = props;
-  return (
-    <div className="slick-next" onClick={onClick}>
-      <ArrowBigRight />
-    </div>
-  );
-};
-
-const PrevArrow = (props: any) => {
-  const { onClick } = props;
-  return (
-    <div className="slick-prev" onClick={onClick}>
-      <ArrowBigLeft />
-    </div>
-  );
-};
+import { Button } from '@/components/ui/button';
 
 interface Product {
   _id: string;
@@ -49,13 +27,16 @@ interface Product {
 
 const ProductPage: React.FC = () => {
   const { productId } = useParams() as { productId: string };
+  const router = useRouter();
   const [product, setProduct] = useState<Product | null>(null);
+  const [mainImage, setMainImage] = useState<string | null>(null);
 
   useEffect(() => {
     if (productId) {
       axios.get(`http://localhost:4000/api/products/${productId}`)
         .then(response => {
           setProduct(response.data);
+          setMainImage(response.data.imageUrl1);
         })
         .catch(error => {
           console.error('Error fetching product:', error);
@@ -81,34 +62,46 @@ const ProductPage: React.FC = () => {
   const trimmedCollectionAddress = `${product.collectionAddress.slice(0, 6)}...${product.collectionAddress.slice(-4)}`;
   const imageUrls = [product.imageUrl1, product.imageUrl2, product.imageUrl3, product.imageUrl4, product.imageUrl5].filter(url => url);
 
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    nextArrow: <NextArrow />,
-    prevArrow: <PrevArrow />
+  const handleThumbnailClick = (url: string) => {
+    setMainImage(url);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-black p-4">
+    <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-black p-4">
+      <div className="mb-4 self-start">
+        <button 
+          onClick={() => router.back()} 
+          className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition"
+        >
+          &larr; Back to Collection
+        </button>
+      </div>
       <Card className="flex flex-col md:flex-row p-8 border rounded-lg shadow-lg bg-white dark:bg-gray-900 dark:border-gray-700 w-full max-w-5xl">
         <div className="w-full md:w-1/2 pr-8">
-          <Slider {...settings}>
+          {mainImage && (
+            <Image 
+              src={mainImage} 
+              alt={product.name} 
+              width={800} 
+              height={800} 
+              className="object-contain rounded-lg mb-4"
+              loading="lazy"
+            />
+          )}
+          <div className="flex space-x-4">
             {imageUrls.map((url, index) => (
-              <div key={index}>
-                <Image 
-                  src={url as string} 
-                  alt={product.name} 
-                  width={500} 
-                  height={500} 
-                  className="object-cover rounded-lg transform transition-transform hover:scale-105"
-                  loading="lazy"
-                />
-              </div>
+              <Image 
+                key={index} 
+                src={url as string} 
+                alt={`${product.name}-${index}`} 
+                width={100} 
+                height={100} 
+                className={`object-contain rounded-md cursor-pointer ${mainImage === url ? 'border-2 border-blue-500' : ''}`}
+                onClick={() => handleThumbnailClick(url as string)}
+                loading="lazy"
+              />
             ))}
-          </Slider>
+          </div>
         </div>
         <div className="w-full md:w-1/2 pl-8 mt-4 md:mt-0">
           <h1 className="text-3xl font-bold mb-4 text-gray-800 dark:text-gray-200">{product.name}</h1>
@@ -120,6 +113,7 @@ const ProductPage: React.FC = () => {
               {trimmedCollectionAddress}
             </Link>
           </p>
+          <Button className="mt-4 w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Buy</Button>
         </div>
       </Card>
     </div>

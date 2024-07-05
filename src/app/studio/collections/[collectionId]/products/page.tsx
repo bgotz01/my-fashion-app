@@ -1,5 +1,3 @@
-// src/app/studio/collections/[collectionId]/products/page.tsx
-
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -10,6 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import Image from 'next/image';
 import Link from 'next/link';
+import ImageDropzone from '@/components/ImageDropzone';
+import JSONForm from '@/components/JSONForm';
+import JSONUpload from '@/components/JSONUpload';
 
 interface Product {
   _id: string;
@@ -65,6 +66,8 @@ const AddProductPage = () => {
   const [deleteProductId, setDeleteProductId] = useState<string | null>(null);
   const router = useRouter();
   const { collectionId } = useParams();
+  const userId = 'test-user-id'; // Replace this with actual user ID logic
+  const [uploadedImages, setUploadedImages] = useState<string[]>(Array(5).fill(""));
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -94,7 +97,6 @@ const AddProductPage = () => {
 
     const numericPrice = parseFloat(price);
     const colorArray = color.split(',').map(c => c.trim());
-    console.log('Price to be sent:', numericPrice);
 
     try {
       const response = await axios.post('http://localhost:4000/api/products', {
@@ -194,7 +196,6 @@ const AddProductPage = () => {
 
     const numericPrice = parseFloat(price);
     const colorArray = color.split(',').map(c => c.trim());
-    console.log('Price to be sent:', numericPrice);
 
     try {
       const response = await axios.put(`http://localhost:4000/api/products/${editProductId}`, {
@@ -260,11 +261,19 @@ const AddProductPage = () => {
     setJsonUrl('');
   };
 
+  const handleImageUpload = (imageUrl: string, index: number) => {
+    setUploadedImages((prevImages) => {
+      const newImages = [...prevImages];
+      newImages[index] = imageUrl;
+      return newImages;
+    });
+  };
+
   const trimAddress = (address: string) =>
     `${address.slice(0, 6)}...${address.slice(-4)}`;
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900 p-4" style={{ paddingTop: '70px' }}>
       <div className="w-full max-w-2xl space-y-4">
         <h2 className="text-2xl font-bold mb-6 text-center">Products</h2>
         {products.map((product: Product) => (
@@ -294,6 +303,18 @@ const AddProductPage = () => {
           </Card>
         ))}
       </div>
+      
+      <div className="mt-8 w-full max-w-lg mx-auto bg-white dark:bg-black p-6 rounded shadow-md border dark:border-white">
+        <h1 className="text-2xl font-bold mb-6 text-center text-black dark:text-white">Upload Images</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[...Array(5)].map((_, index) => (
+            <ImageDropzone key={index} userId={userId} onUpload={handleImageUpload} index={index} />
+          ))}
+        </div>
+        <JSONForm uploadedImages={uploadedImages} />
+        <JSONUpload />
+      </div>
+
       <div className="mt-8 w-full max-w-lg p-8 bg-white dark:bg-gray-800 rounded shadow-md mb-8">
         <h2 className="text-2xl font-bold mb-6 text-center">{editProductId ? 'Edit Product' : 'Add New Product'}</h2>
         {error && <p className="text-red-500 mb-4">{error}</p>}
@@ -339,23 +360,38 @@ const AddProductPage = () => {
           </div>
           <div>
             <label htmlFor="imageUrl1" className="block text-sm font-bold text-gray-700 dark:text-gray-300">Image URL 1</label>
-            <Input id="imageUrl1" value={imageUrl1} onChange={(e) => setImageUrl1(e.target.value)} placeholder="Image URL 1" required />
+            <select id="imageUrl1" value={imageUrl1} onChange={(e) => setImageUrl1(e.target.value)} className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
+              <option value="" disabled>Select Image</option>
+              {uploadedImages.map((url, index) => url && <option key={index} value={url}>{url}</option>)}
+            </select>
           </div>
           <div>
             <label htmlFor="imageUrl2" className="block text-sm font-bold text-gray-700 dark:text-gray-300">Image URL 2</label>
-            <Input id="imageUrl2" value={imageUrl2} onChange={(e) => setImageUrl2(e.target.value)} placeholder="Image URL 2" />
+            <select id="imageUrl2" value={imageUrl2} onChange={(e) => setImageUrl2(e.target.value)} className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
+              <option value="" disabled>Select Image</option>
+              {uploadedImages.map((url, index) => url && <option key={index} value={url}>{url}</option>)}
+            </select>
           </div>
           <div>
             <label htmlFor="imageUrl3" className="block text-sm font-bold text-gray-700 dark:text-gray-300">Image URL 3</label>
-            <Input id="imageUrl3" value={imageUrl3} onChange={(e) => setImageUrl3(e.target.value)} placeholder="Image URL 3" />
+            <select id="imageUrl3" value={imageUrl3} onChange={(e) => setImageUrl3(e.target.value)} className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
+              <option value="" disabled>Select Image</option>
+              {uploadedImages.map((url, index) => url && <option key={index} value={url}>{url}</option>)}
+            </select>
           </div>
           <div>
             <label htmlFor="imageUrl4" className="block text-sm font-bold text-gray-700 dark:text-gray-300">Image URL 4</label>
-            <Input id="imageUrl4" value={imageUrl4} onChange={(e) => setImageUrl4(e.target.value)} placeholder="Image URL 4" />
+            <select id="imageUrl4" value={imageUrl4} onChange={(e) => setImageUrl4(e.target.value)} className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
+              <option value="" disabled>Select Image</option>
+              {uploadedImages.map((url, index) => url && <option key={index} value={url}>{url}</option>)}
+            </select>
           </div>
           <div>
             <label htmlFor="imageUrl5" className="block text-sm font-bold text-gray-700 dark:text-gray-300">Image URL 5</label>
-            <Input id="imageUrl5" value={imageUrl5} onChange={(e) => setImageUrl5(e.target.value)} placeholder="Image URL 5" />
+            <select id="imageUrl5" value={imageUrl5} onChange={(e) => setImageUrl5(e.target.value)} className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
+              <option value="" disabled>Select Image</option>
+              {uploadedImages.map((url, index) => url && <option key={index} value={url}>{url}</option>)}
+            </select>
           </div>
           <div>
             <label htmlFor="jsonUrl" className="block text-sm font-bold text-gray-700 dark:text-gray-300">JSON URL</label>

@@ -15,7 +15,8 @@ const ProductSchema = new mongoose.Schema({
   imageUrl3: { type: String },
   imageUrl4: { type: String },
   imageUrl5: { type: String },
-  jsonUrl: { type: String }
+  jsonUrl: { type: String },
+  listed: { type: Boolean, default: false },
 });
 
 ProductSchema.pre('remove', async function (next) {

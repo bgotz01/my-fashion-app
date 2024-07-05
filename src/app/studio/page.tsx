@@ -12,7 +12,7 @@ const StudioPage = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-black p-4">
       <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="flex flex-col items-center justify-center space-y-4">
-          <Link href="/studio/mint-nft">
+          <Link href="/studio/mint">
             <Button className="w-full h-16 text-xl bg-blue-600 text-white hover:bg-blue-700">Mint NFT</Button>
           </Link>
           <Link href="/studio/collections">
