@@ -18,6 +18,9 @@ const StudioPage = () => {
           <Link href="/studio/collections">
             <Button className="w-full h-16 text-xl bg-gray-600 text-white hover:bg-gray-700">Collections</Button>
           </Link>
+          <Link href="/studio/mynft">
+            <Button className="w-full h-16 text-xl bg-gray-600 text-white hover:bg-gray-700">My NFTs</Button>
+          </Link>
         </div>
         <div className="flex justify-center">
           <Image 
