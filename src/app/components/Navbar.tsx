@@ -7,11 +7,14 @@ import axios from "axios";
 import Image from "next/image";
 import { Sun, Moon } from "lucide-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import dynamic from 'next/dynamic';
+import dynamic from "next/dynamic";
 
 // Dynamically load WalletMultiButton to ensure it is only rendered on the client side
 const DynamicWalletMultiButton = dynamic(
-  () => import('@solana/wallet-adapter-react-ui').then((mod) => mod.WalletMultiButton),
+  () =>
+    import("@solana/wallet-adapter-react-ui").then(
+      (mod) => mod.WalletMultiButton
+    ),
   { ssr: false }
 );
 
@@ -66,6 +69,9 @@ const NavBar = () => {
           </Link>
           <Link href="/discover/closet" className="text-white hidden sm:inline">
             Closet
+          </Link>
+          <Link href="/marketplace" className="text-white hidden sm:inline">
+            Market
           </Link>
           <button
             onClick={handleToggleTheme}
