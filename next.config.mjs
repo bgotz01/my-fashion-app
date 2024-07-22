@@ -7,7 +7,7 @@ dotenv.config();
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     images: {
-      domains: ['nftcollectionuploads.s3.amazonaws.com', 'nftuploads2.s3.amazonaws.com', 'nftcollectionuploads.s3.us-east-1.amazonaws.com'],
+      domains: ['nftcollectionuploads.s3.amazonaws.com', 'nftuploads2.s3.amazonaws.com', 'nftcollectionuploads.s3.us-east-1.amazonaws.com','qn-shared.quicknode-ipfs.com'],
     },
     env: {
       AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
