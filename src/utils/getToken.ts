@@ -1,3 +1,5 @@
+import { extractGroupAddress } from "./getAssets";
+
 //src/utils/getToken.ts
 const url = `https://devnet.helius-rpc.com/?api-key=ebe57d8c-01ae-4317-957e-d350790af639`;
 
@@ -40,13 +42,14 @@ export const getAsset = async (tokenAddress: string) => {
         if (!result || !result.content || !result.content.metadata) {
             throw new Error('Invalid response structure');
         }
-
+        const groupAddress = extractGroupAddress(result)
+        
         const dataProfile = {
             name: result.content.metadata.name || 'Unknown',
             description: result.content.metadata.description || 'No description',
             imageURI: result.content.links.image || '',
             jsonURI: result.content.json_uri || '',
-            groupAddress: result.mint_extensions?.group_pointer?.group_address || '',
+            groupAddress
         };
 
         console.log("Data Profile: ", dataProfile);
