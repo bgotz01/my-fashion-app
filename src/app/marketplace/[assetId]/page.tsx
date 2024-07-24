@@ -191,7 +191,7 @@ const ProductPage: React.FC = () => {
             </Link>
           </p>
           <div className="text-md text-gray-800 dark:text-gray-200">
-            <strong>Price:{product.price}</strong>
+            <strong>Price:{product.price / 1000000}USDC</strong>
           </div>
           {product.seller == publicKey?.toString() ? (
             <Button
