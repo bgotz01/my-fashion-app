@@ -133,17 +133,22 @@ export type SolanaNftMarketplace = {
           "isSigner": false
         },
         {
+          "name": "tokenProgramUsdc",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "buyerTokenAccount",
+          "name": "buyerNftAccount",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "sellerTokenAccount",
+          "name": "buyerTokenAccount",
           "isMut": true,
           "isSigner": false
         }
@@ -326,17 +331,22 @@ export const IDL: SolanaNftMarketplace = {
           "isSigner": false
         },
         {
+          "name": "tokenProgramUsdc",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "buyerTokenAccount",
+          "name": "buyerNftAccount",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "sellerTokenAccount",
+          "name": "buyerTokenAccount",
           "isMut": true,
           "isSigner": false
         }
