@@ -10,7 +10,9 @@ import {
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   createAssociatedTokenAccountIdempotentInstruction,
+  getAccount,
   getAssociatedTokenAddress,
+  getOrCreateAssociatedTokenAccount,
   getTokenMetadata,
   TOKEN_2022_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
@@ -24,7 +26,7 @@ import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import { NFTDetail } from "@/app/marketplace/page";
 
 const PREFIX = "MARKETPLACE";
-const programId = new PublicKey("GfLfsgUP5dQ2gGN4DAPSGZErKSCVZzsVBtof7ZafUP3n");
+const programId = new PublicKey("FX2TuF4AsoxvbkNC95CK5RGdkpdMWFsPszULZy68Kexp");
 
 async function loadProgram(connection: Connection, provider: any) {
   //const provider = new anchor.AnchorProvider(connection, wallet, {});
@@ -45,16 +47,15 @@ export async function listNFT(
   wallet: any,
   provider: anchor.AnchorProvider
 ) {
-  console.log("start");
   const program = await loadProgram(connection, provider);
-  console.log("program loaded");
   const [vault, vaultBump] = PublicKey.findProgramAddressSync(
     [Buffer.from(PREFIX), Buffer.from("vault"), mint.toBytes()],
     programId
   );
 
   const listing = anchor.web3.Keypair.generate();
-  const data = new BN(price);
+  console.log("PRICE:", price);
+  const data = new BN(price * 1000000);
   let latestBlock = (await provider.connection.getLatestBlockhash("finalized"))
     .blockhash;
 
@@ -112,6 +113,98 @@ export async function buyNFT(
     false,
     TOKEN_2022_PROGRAM_ID
   );
+  const SOLANA_USDC_PUBKEY = "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr";
+  const usdcMint = new PublicKey(SOLANA_USDC_PUBKEY);
+
+  let buyerUSDCAccount = await getAssociatedTokenAddress(
+    usdcMint,
+    buyer,
+    false,
+    TOKEN_PROGRAM_ID,
+    ASSOCIATED_TOKEN_PROGRAM_ID
+  );
+  console.log(buyer.toBase58());
+
+  const buyerUSDCAccountInfo = await connection.getAccountInfo(
+    buyerUSDCAccount
+  );
+  if (buyerUSDCAccountInfo == null) {
+    console.log("creating usdc associated token account");
+    await createAssociatedAccount(
+      buyer,
+      buyerUSDCAccount,
+      buyer,
+      usdcMint,
+      provider,
+      sendTransaction,
+      connection
+    );
+    console.log("created usdc account");
+  }
+
+  let sellerUSDCAccount = await getAssociatedTokenAddress(
+    usdcMint,
+    seller,
+    false,
+    TOKEN_PROGRAM_ID,
+    ASSOCIATED_TOKEN_PROGRAM_ID
+  );
+  const sellerUSDCAccountInfo = await connection.getAccountInfo(
+    sellerUSDCAccount
+  );
+  if (sellerUSDCAccountInfo == null) {
+    console.log("creating usdc associated token account");
+    await createAssociatedAccount(
+      buyer,
+      sellerUSDCAccount,
+      seller,
+      usdcMint,
+      provider,
+      sendTransaction,
+      connection
+    );
+    console.log("created usdc account");
+  }
+
+  const buyerTokenAccount = await getOrCreateAssociatedTokenAccount(
+    connection,
+    buyer,
+    usdcMint,
+    buyer
+  );
+  console.log(buyerTokenAccount);
+
+  const buyerTokenAccountInfo = await getAccount(
+    connection,
+    buyerTokenAccount.address,
+    "confirmed",
+    TOKEN_PROGRAM_ID
+  );
+  console.log(
+    "buyer associated account Info address:",
+    buyerTokenAccount.address.toBase58()
+  );
+  console.log("buyer accountInfo:", buyerTokenAccountInfo.amount);
+
+  const sellerTokenAccount = await getOrCreateAssociatedTokenAccount(
+    connection,
+    buyer,
+    usdcMint,
+    seller
+  );
+  console.log(sellerTokenAccount);
+
+  const sellerTokenAccountInfo = await getAccount(
+    connection,
+    sellerTokenAccount.address,
+    "confirmed",
+    TOKEN_PROGRAM_ID
+  );
+  console.log(
+    "seller associated account Info address:",
+    sellerTokenAccount.address.toBase58()
+  );
+  console.log("seller accountInfo:", sellerTokenAccountInfo.amount);
 
   // const [listing, listingBump] = PublicKey.findProgramAddressSync(
   //   [Buffer.from(PREFIX), Buffer.from("vault"), mint.toBytes()],
@@ -170,18 +263,21 @@ export async function buyNFT(
       listing: listing,
       vault: vault,
       buyer: buyer,
-      seller: seller,
+      seller: sellerTokenAccount.address,
       nftAccount: sellerNFTTokenAccount,
-      sellerTokenAccount: sellerNFTTokenAccount,
-      buyerTokenAccount: buyerNFTTokenAccount,
+      buyerTokenAccount: buyerTokenAccount.address,
+      buyerNftAccount: buyerNFTTokenAccount,
       tokenProgram: TOKEN_2022_PROGRAM_ID,
       systemProgram: SystemProgram.programId,
+      tokenProgramUsdc: TOKEN_PROGRAM_ID,
     })
     .instruction();
   console.log("Instruction to buy:", instruction);
+
+  console.log("buyer token account:", buyerTokenAccount.address.toBase58());
+  const transaction = new Transaction().add(instruction);
   let latestBlock = (await provider.connection.getLatestBlockhash("finalized"))
     .blockhash;
-  const transaction = new Transaction().add(instruction);
   transaction.recentBlockhash = latestBlock;
   transaction.feePayer = buyer;
   console.log("transaction:", transaction);
@@ -313,4 +409,31 @@ export async function getNFTDetail(
     listing: listing,
   };
   return NFTItem;
+}
+
+async function createAssociatedAccount(
+  payer: PublicKey,
+  associatedToken: PublicKey,
+  owner: PublicKey,
+  mint: PublicKey,
+  provider: anchor.AnchorProvider,
+  sendTransaction: WalletAdapterProps["sendTransaction"],
+  connection: Connection
+) {
+  const usdcTransaction = new Transaction().add(
+    createAssociatedTokenAccountIdempotentInstruction(
+      payer,
+      associatedToken,
+      owner,
+      mint,
+      TOKEN_PROGRAM_ID,
+      ASSOCIATED_TOKEN_PROGRAM_ID
+    )
+  );
+  const latestBlockhash = await provider.connection.getLatestBlockhash();
+  const tokenSign = await sendTransaction(usdcTransaction, connection);
+  await provider.connection.confirmTransaction(
+    { signature: tokenSign, ...latestBlockhash },
+    "confirmed"
+  );
 }
